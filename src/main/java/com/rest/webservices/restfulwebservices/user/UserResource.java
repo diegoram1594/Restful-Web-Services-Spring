@@ -1,11 +1,13 @@
 package com.rest.webservices.restfulwebservices.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -17,11 +19,12 @@ public class UserResource {
     public List<User> findAll(){
         return service.findAll();
     }
+
     @GetMapping("/users/{id}")
     public User findOne(@PathVariable Integer id){
         User user = service.findOne(id);
         if (user == null){
-            throw new UserNotFoundException("id" +id );
+            throw new NotFoundException("User Not Found id " + id);
         }
         return user;
     }
@@ -34,6 +37,40 @@ public class UserResource {
                 .path("/id")
                 .buildAndExpand(user.getId()).toUri();
         return ResponseEntity.created(location).build();
+    }
+
+
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<Object> deleteUser(@PathVariable Integer id){
+        boolean isRemoved  = service.delete(id);
+        if (!isRemoved ){
+            throw new NotFoundException("User Not Found id " + id);
+        }
+        return new ResponseEntity<>(id, HttpStatus.OK);
+    }
+
+    @PostMapping("/users/{id}/posts")
+    public ResponseEntity<Object> createPostUser(@PathVariable Integer id,@RequestBody Post post){
+        boolean postCreated = service.createPost(id,post);
+        if (!postCreated){
+            throw new NotFoundException("User Not Found id " + id);
+        }
+        return new ResponseEntity<>(post, HttpStatus.OK);
+    }
+
+    @GetMapping("/users/{id}/posts")
+    public ResponseEntity<Object> allPostsUser(@PathVariable Integer id){
+        ArrayList<Post> posts = service.getAllPosts(id);
+        if (posts == null){
+            throw new NotFoundException("User Not Found id " + id);
+        }
+        return new ResponseEntity<>(posts, HttpStatus.OK);
+    }
+
+    @GetMapping("/users/{id}/posts/{postId}")
+    public ResponseEntity<Object> allPostsUser(@PathVariable Integer id, @PathVariable Integer postId){
+        Post post = service.getPostId(id,postId);
+        return new ResponseEntity<>(post, HttpStatus.OK);
     }
 
 
