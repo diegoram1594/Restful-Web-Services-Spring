@@ -7,6 +7,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,12 +25,19 @@ public class UserResource {
     }
 
     @GetMapping("/users/{id}")
-    public User findOne(@PathVariable Integer id){
+    public EntityModel<User> findOne(@PathVariable Integer id){
         User user = service.findOne(id);
         if (user == null){
             throw new NotFoundException("User Not Found id " + id);
         }
-        return user;
+        EntityModel <User> entityModel = EntityModel.of(user);
+
+        WebMvcLinkBuilder linkTo =
+                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder
+                        .methodOn(this.getClass()).findAll());
+
+        entityModel.add(linkTo.withRel("all-users"));
+        return entityModel;
     }
 
     @PostMapping("/users")
@@ -47,6 +57,7 @@ public class UserResource {
         if (!isRemoved ){
             throw new NotFoundException("User Not Found id " + id);
         }
+
         return new ResponseEntity<>(id, HttpStatus.NO_CONTENT);
     }
 
