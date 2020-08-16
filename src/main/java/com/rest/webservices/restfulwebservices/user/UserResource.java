@@ -3,6 +3,7 @@ package com.rest.webservices.restfulwebservices.user;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -30,11 +31,11 @@ public class UserResource {
     }
 
     @PostMapping("/users")
-    public ResponseEntity<Object> saveUser(@RequestBody User user){
+    public ResponseEntity<Object> saveUser(@Validated @RequestBody User user){
         user = service.save(user);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
-                .path("/id")
+                .path("/"+user.getId())
                 .buildAndExpand(user.getId()).toUri();
         return ResponseEntity.created(location).build();
     }
@@ -46,7 +47,7 @@ public class UserResource {
         if (!isRemoved ){
             throw new NotFoundException("User Not Found id " + id);
         }
-        return new ResponseEntity<>(id, HttpStatus.OK);
+        return new ResponseEntity<>(id, HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/users/{id}/posts")
