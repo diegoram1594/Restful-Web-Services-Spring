@@ -79,7 +79,7 @@ public class UserResource {
         return new ResponseEntity<>(posts, HttpStatus.OK);
     }
 
-    @RequestMapping("/users/{id}/posts/{postId}")
+    @GetMapping("/users/{id}/posts/{postId}")
     public ResponseEntity<Object> allPostsUser(@PathVariable Integer id, @PathVariable Integer postId){
         Post post = service.getPostId(id,postId);
         return new ResponseEntity<>(post, HttpStatus.OK);
