@@ -1,8 +1,12 @@
 package com.rest.webservices.restfulwebservices.user;
 
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -25,12 +29,18 @@ public class UserResource {
     }
 
     @GetMapping("/users/{id}")
-    public EntityModel<User> findOne(@PathVariable Integer id){
+    public EntityModel<MappingJacksonValue> findOne(@PathVariable Integer id){
         User user = service.findOne(id);
         if (user == null){
             throw new NotFoundException("User Not Found id " + id);
         }
-        EntityModel <User> entityModel = EntityModel.of(user);
+        //Filter ID
+        SimpleBeanPropertyFilter filter = SimpleBeanPropertyFilter.filterOutAllExcept("id");
+        FilterProvider filterProvider = new SimpleFilterProvider()
+                                            .addFilter("UserFilter",filter);
+        MappingJacksonValue value = new MappingJacksonValue(user);
+        value.setFilters(filterProvider);
+        EntityModel <MappingJacksonValue> entityModel = EntityModel.of(value);
 
         WebMvcLinkBuilder linkTo =
                 WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder

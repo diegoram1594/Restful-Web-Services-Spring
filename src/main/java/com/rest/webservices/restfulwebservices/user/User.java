@@ -1,5 +1,6 @@
 package com.rest.webservices.restfulwebservices.user;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
