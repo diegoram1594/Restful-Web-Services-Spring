@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJacksonValue;
@@ -11,26 +13,28 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
-
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-public class UserResource {
+public class UserJPAResource {
     @Autowired
     private UserDaoService service;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private UserService userService;
 
-    @GetMapping("/users")
+    @GetMapping("/jpa/users")
     public List<User> findAll(){
-        return service.findAll();
+        return userRepository.findAll();
     }
 
-    @GetMapping("/users/{id}")
+    @GetMapping("/jpa/users/{id}")
     public EntityModel<MappingJacksonValue> findOne(@PathVariable Integer id){
-        User user = service.findOne(id);
-        if (user == null){
+        Optional<User> user = userRepository.findById(id);
+        if (!user.isPresent()){
             throw new NotFoundException("User Not Found id " + id);
         }
         //Filter ID
@@ -49,9 +53,9 @@ public class UserResource {
         return entityModel;
     }
 
-    @PostMapping("/users")
+    @PostMapping("/jpa/users")
     public ResponseEntity<Object> saveUser(@Validated @RequestBody User user){
-        user = service.save(user);
+        user = userRepository.save(user);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/"+user.getId())
@@ -60,37 +64,35 @@ public class UserResource {
     }
 
 
-    @DeleteMapping("/users/{id}")
+    @DeleteMapping("/jpa/users/{id}")
     public ResponseEntity<Object> deleteUser(@PathVariable Integer id){
-        boolean isRemoved  = service.delete(id);
-        if (!isRemoved ){
-            throw new NotFoundException("User Not Found id " + id);
-        }
+        userRepository.deleteById(id);
+        //if (!isRemoved ){
+        //    throw new NotFoundException("User Not Found id " + id);
+       // }
 
         return new ResponseEntity<>(id, HttpStatus.NO_CONTENT);
     }
 
-    @PostMapping("/users/{id}/posts")
+    @PostMapping("/jpa/users/{id}/posts")
     public ResponseEntity<Object> createPostUser(@PathVariable Integer id,@RequestBody Post post){
-        boolean postCreated = service.createPost(id,post);
-        if (!postCreated){
+
+        Post postCreated = userService.createPost(id,post);
+        if (postCreated == null){
             throw new NotFoundException("User Not Found id " + id);
         }
-        return new ResponseEntity<>(post, HttpStatus.OK);
+        return new ResponseEntity<>(null, HttpStatus.CREATED);
     }
 
-    @GetMapping("/users/{id}/posts")
+    @GetMapping("/jpa/users/{id}/posts")
     public ResponseEntity<Object> allPostsUser(@PathVariable Integer id){
-        List<Post> posts = service.getAllPosts(id);
-        if (posts == null){
-            throw new NotFoundException("User Not Found id " + id);
-        }
+        List<Post> posts = userService.getAllPosts(id);
         return new ResponseEntity<>(posts, HttpStatus.OK);
     }
 
-    @GetMapping("/users/{id}/posts/{postId}")
+    @GetMapping("/jpa/users/{id}/posts/{postId}")
     public ResponseEntity<Object> allPostsUser(@PathVariable Integer id, @PathVariable Integer postId){
-        Post post = service.getPostId(id,postId);
+        Post post = userService.getPostId(id,postId);
         return new ResponseEntity<>(post, HttpStatus.OK);
     }
 

@@ -1,8 +1,11 @@
 package com.rest.webservices.restfulwebservices.user;
 
+import javax.persistence.*;
 import java.util.Date;
-
+@Entity
 public class Post {
+    @Id
+    @GeneratedValue
     Integer id;
     private String message;
     private Date timestamp;
@@ -11,6 +14,10 @@ public class Post {
         this.id = id;
         this.message = message;
         this.timestamp = timestamp;
+    }
+
+    public Post() {
+
     }
 
     public String getMessage() {
@@ -36,4 +43,5 @@ public class Post {
     public void setId(Integer id) {
         this.id = id;
     }
+
 }

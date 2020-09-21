@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Component
 public class UserDaoService {
@@ -54,7 +55,7 @@ public class UserDaoService {
         return false;
     }
 
-    public ArrayList<Post> getAllPosts(Integer id){
+    public List<Post> getAllPosts(Integer id){
         User user = findOne(id);
         if (user != null){
             return user.getPosts();
