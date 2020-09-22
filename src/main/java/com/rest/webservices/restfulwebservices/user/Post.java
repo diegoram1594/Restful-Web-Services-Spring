@@ -1,5 +1,7 @@
 package com.rest.webservices.restfulwebservices.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.Date;
 @Entity
@@ -9,6 +11,9 @@ public class Post {
     Integer id;
     private String message;
     private Date timestamp;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private User users;
 
     public Post(Integer id, String message, Date timestamp) {
         this.id = id;
@@ -44,4 +49,13 @@ public class Post {
         this.id = id;
     }
 
+
+
+    public User getUsers() {
+        return users;
+    }
+
+    public void setUsers(User users) {
+        this.users = users;
+    }
 }

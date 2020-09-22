@@ -6,12 +6,13 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 @Service
 public class UserService {
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private PostRepository postRepository;
 
     public Post createPost( Integer userId,  Post post){
         Optional<User> user = userRepository.findById(userId);
@@ -19,8 +20,8 @@ public class UserService {
             return null;
         }
         post.setTimestamp(new Date());
-        user.get().getPosts().add(post);
-        userRepository.save(user.get());
+        post.setUsers(user.get());
+        postRepository.save(post);
         return post;
     }
 
@@ -37,7 +38,7 @@ public class UserService {
         if (!user.isPresent()){
             throw new NotFoundException("User Not Found id " + userId);
         }
-        Optional<Post> res = user.get().getPosts().stream().filter(post -> post.getId() == postId).findFirst();
+        Optional<Post> res = user.get().getPosts().stream().filter(post -> post.getId().equals(postId)).findFirst();
         if (!res.isPresent()){
             throw new NotFoundException("Post Not Found id " + postId);
         }

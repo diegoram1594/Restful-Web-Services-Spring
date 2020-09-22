@@ -23,7 +23,7 @@ public class User {
     @ApiModelProperty(notes = "Birth date should be in the past")
     @Past
     private Date birthDate;
-    @OneToMany(cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
+    @OneToMany(cascade = {CascadeType.ALL}, fetch = FetchType.LAZY, mappedBy = "users")
     private List<Post> posts;
 
     public User(int id,String name, Date birthDate) {
