@@ -1,7 +1,9 @@
 package com.rest.webservices.restfulwebservices.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import javax.validation.constraints.Past;
@@ -25,12 +27,15 @@ public class User {
     private Date birthDate;
     @OneToMany(cascade = {CascadeType.ALL}, fetch = FetchType.LAZY, mappedBy = "users")
     private List<Post> posts;
+    @JsonIgnore
+    private String pass;
 
-    public User(int id,String name, Date birthDate) {
+    public User(int id,String name, Date birthDate,String pass) {
         this.id =id;
         this.name = name;
         this.birthDate = birthDate;
         this.posts = new ArrayList<>();
+        this.pass = pass;
     }
 
     public User() {
@@ -67,5 +72,13 @@ public class User {
 
     public void setPosts(ArrayList<Post> posts) {
         this.posts = posts;
+    }
+
+    public String getPass() {
+        return pass;
+    }
+
+    public void setPass(String pass) {
+        this.pass = pass;
     }
 }

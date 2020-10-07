@@ -19,12 +19,14 @@ import java.util.Optional;
 
 @RestController
 public class UserJPAResource {
+    private final UserRepository userRepository;
+    private final UserService userService;
+
     @Autowired
-    private UserDaoService service;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private UserService userService;
+    public UserJPAResource(UserRepository userRepository, UserService userService) {
+        this.userRepository = userRepository;
+        this.userService = userService;
+    }
 
     @GetMapping("/jpa/users")
     public List<User> findAll(){
